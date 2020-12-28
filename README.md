@@ -1,2 +1,2 @@
 # msanndata
-Multi-sample version of AnnData
+A very thin multi-sample version AnnData
