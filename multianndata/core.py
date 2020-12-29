@@ -51,5 +51,5 @@ class MultiAnnData(ad.AnnData):
         if type(columns) == str:
             columns = [columns]
         for c in columns:
-            self.samplem[c] = \
+            self.samplem.loc[:,c] = \
                 self.obs[[self.sampleid, c]].groupby(by=self.sampleid).aggregate(aggregate)
