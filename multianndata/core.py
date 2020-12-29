@@ -43,6 +43,10 @@ class MultiAnnData(ad.AnnData):
     def obs_sampleids(self):
         return self.obs[self.sampleid] if self.sampleid in self.obs.columns else None
 
+    @property
+    def sample_sizes(self):
+        return self.obs[self.sampleid].value_counts()
+
     def obs_to_sample(self, columns, aggregate=np.mean):
         if type(columns) == str:
             columns = [columns]
