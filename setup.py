@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="multianndata", # Replace with your own username
-    version="0.0.1",
+    version="0.0.2",
     author="Yakir Reshef, Laurie Rumker",
     author_email="yreshef@broadinstitute.org",
     description="Multi-sample version of AnnData",
