@@ -1,5 +1,4 @@
 import anndata as ad
-import scanpy as sc
 import numpy as np
 
 class MultiAnnData(ad.AnnData):
