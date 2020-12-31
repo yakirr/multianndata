@@ -29,6 +29,10 @@ class MultiAnnData(ad.AnnData):
         del self.uns['sampleXmeta']
 
     @property
+    def N(self):
+        return len(self.samplem) if self.samplem is not None else None
+
+    @property
     def sampleid(self):
         return self._sampleid
     @sampleid.setter
