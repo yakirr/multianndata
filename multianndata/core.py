@@ -3,8 +3,11 @@ import numpy as np
 
 class MultiAnnData(ad.AnnData):
     def __init__(self, *args, **kwargs):
+        self.sampleid = kwargs.pop('sampleid', 'id')
+        sm = kwargs.pop('samplem', None)
         super().__init__(*args, **kwargs)
-        self.sampleid = 'id'
+        if sm is not None:
+            self.samplem = sm
         self._check()
 
     def _check(self):
