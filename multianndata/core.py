@@ -1,5 +1,6 @@
 import anndata as ad
 import numpy as np
+import pandas as pd
 
 class MultiAnnData(ad.AnnData):
     def __init__(self, *args, **kwargs):
@@ -8,6 +9,9 @@ class MultiAnnData(ad.AnnData):
         super().__init__(*args, **kwargs)
         if sm is not None:
             self.samplem = sm
+        elif self.obs_sampleids is not None and self.samplem is None:
+            self.samplem = pd.DataFrame(
+                index=pd.Series(self.obs_sampleids.unique(), name=self.sampleid))
         self._check()
 
     def _check(self):
