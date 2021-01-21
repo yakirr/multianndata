@@ -3,16 +3,28 @@ import numpy as np
 import pandas as pd
 
 class MultiAnnData(ad.AnnData):
-    def __init__(self, *args, **kwargs):
-        self.sampleid = kwargs.pop('sampleid', 'id')
-        sm = kwargs.pop('samplem', None)
+    def __init__(self, *args, samplem=None, sampleid='id', **kwargs):
+        def verify_numeric(df, name):
+            non_numeric = df.columns.values[[not pd.api.types.is_numeric_dtype(df[c])
+                                for c in df.columns]]
+            if len(non_numeric) > 0:
+                print('warning: the following columns of '+name+' are non-numeric.')
+                print(non_numeric)
+                print('consider casting to numeric types where appropriate, and')
+                print('consider re-coding text-valued columns with pandas.get_dummies')
+
+        self.sampleid = sampleid
         super().__init__(*args, **kwargs)
-        if sm is not None:
-            self.samplem = sm
-        elif self.obs_sampleids is not None and self.samplem is None:
+        if samplem is not None:
+            self.samplem = samplem
+            verify_numeric(self.samplem, 'samplem')
+        elif self.samplem is None and self.obs_sampleids is not None:
             self.samplem = pd.DataFrame(
                 index=pd.Series(self.obs_sampleids.unique(), name=self.sampleid))
-        self._check()
+            verify_numeric(self.samplem, 'samplem')
+            verify_numeric(self.obs, 'obs')
+        else:
+            self._check()
 
     def _check(self):
         if self.samplem is None:
@@ -64,3 +76,15 @@ class MultiAnnData(ad.AnnData):
         for c in columns:
             self.samplem.loc[:,c] = \
                 self.obs[[self.sampleid, c]].groupby(by=self.sampleid).aggregate(aggregate)
+
+    def merge_duplicates(self, sample_info):
+        self.obs[self.sampleid] = self.obs[self.sampleid].replace(
+                            to_replace=sample_info.index,
+                            value=sample_info.values)
+        self.samplem[sample_info.name] = sample_info
+        new_samplem = self.samplem.drop_duplicates(subset=sample_info.name)
+        if len(new_samplem) != len(self.samplem.drop_duplicates()):
+            print('warning: samples with non-identical covariates are being merged')
+            print('you may not want to merge these samples')
+        self.samplem = new_samplem.set_index(
+                        sample_info.name, drop=True)
